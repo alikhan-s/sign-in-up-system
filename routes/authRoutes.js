@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const router = express.Router();
 
-// Middleware to protect routes [cite: 34]
+// Middleware to protect routes
 const isAuthenticated = (req, res, next) => {
   if (req.session.userId) {
     return next();
@@ -16,22 +16,22 @@ router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // 1. Validation [cite: 39]
+    // Validation
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    // 2. Check unique email [cite: 40]
+    // Check unique email
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already exists' });
     }
 
-    // 3. Hash password
+    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // 4. Save User
+    // Save User
     const newUser = new User({ name, email, password: hashedPassword });
     await newUser.save();
 
